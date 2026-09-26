@@ -17,6 +17,8 @@ for work in flight.
 ## Rules
 
 - Follow `docs/coding-style.md`.
+- Follow `docs/testing.md` for which kind of test to write and what to
+  name the file.
 - Use the On Writing Well skill whenever you write in this repo, including
   chat threads, comments, docs, and commit messages.
 - Each sim module has an `architecture.md` next to its code. See

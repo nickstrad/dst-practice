@@ -49,6 +49,7 @@ What the fake does not do yet, and which future project needs it.
 - Explain mechanism and intent. Skip a line-by-line account of the code.
   Link the pattern IDs in `docs/options.md`.
 - Keep the whole file readable in one or two screens.
+- Name test files as `docs/testing.md` says.
 - A system under test outside `sim/` owns its invariants in its own
   `invariants.md`. `What it proves` may repeat the ones this fake enables,
   but it links to that file rather than restating the full list. See the

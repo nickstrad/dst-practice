@@ -43,6 +43,9 @@ Rule: a reader should learn the behavior from the test names and bodies.
 Inline the idiom at each call site when the idiom is the lesson. Write
 `errors.As` in every test that needs it rather than hiding it in a helper.
 
+Spec tests are one of three kinds. `docs/testing.md` describes the other
+two and the file name each kind uses.
+
 ## Test doubles obey the interface
 
 Rule: a fake returns only values the interface allows.
