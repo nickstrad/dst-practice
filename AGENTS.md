@@ -3,15 +3,16 @@
 ## What this repo is
 
 This repo holds small Go systems built to practice deterministic simulation
-testing. See `docs/options.md` for the project list and `state.md` for current
-work.
+testing. See `docs/options.md` for the project list and `.scratchpad/state/`
+for work in flight.
 
 ## Always do first
 
 - Scan `docs/knowledge/index.md` before you start any task. Read every entry
   that touches the task.
-- Read `state.md` for current work and open items. Update it when you
-  finish.
+- Check `.scratchpad/state/` for a file on the task you were given. If one
+  exists, resume from it. If not, and the task may outlive one context
+  window, start one with the `do-work` skill.
 
 ## Rules
 

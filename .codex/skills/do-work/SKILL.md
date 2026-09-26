@@ -12,8 +12,8 @@ agent can clear its context at any point and restart from that file alone.
 
 ## Procedure
 
-1. Read `AGENTS.md`, `state.md`, and `docs/knowledge/index.md`. Read every
-   knowledge entry that touches the task.
+1. Read `AGENTS.md` and `docs/knowledge/index.md`. Read every knowledge
+   entry that touches the task.
 2. Check `.scratchpad/state/` for an existing file on this work. If one
    exists, read it and continue from its last entry. Do not create a
    second file.
@@ -31,8 +31,8 @@ agent can clear its context at any point and restart from that file alone.
 7. For each item in the reflection that is a real learning, run the
    `update-knowledge` skill. Add a pointer in the reflection to each entry
    you wrote.
-8. Update `state.md` for the repo. Then finish by printing the state file
-   path and the knowledge entries you added.
+8. Finish by printing the state file path and the knowledge entries you
+   added.
 
 ## The two shapes
 

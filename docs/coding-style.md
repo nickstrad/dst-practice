@@ -74,8 +74,10 @@ wrapper.
 
 Rule: build a shared helper only when a second caller needs it.
 
-Until then, write the plan down in `state.md` under open items. The
-`sim/rand` package waits there now.
+Until then, write the plan down in the Open items section of the nearest
+`architecture.md`, or in the state file for the current work under
+`.scratchpad/state/`. The `sim/rand` package waits in `docs/options.md`
+now.
 
 ## The DST design rule
 
