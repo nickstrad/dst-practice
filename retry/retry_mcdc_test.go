@@ -19,7 +19,12 @@ import (
 
 // TestDeadlineDecision covers the compound decision in Do:
 //
-//	!deadline.IsZero() && wakeUp.After(deadline)
+//	if !deadline.IsZero() && wakeUp.After(deadline) { give up }
+//
+// To meet MC/DC with two conditions A && B, three rows must show that
+// each condition flips the outcome while the other holds still: A false
+// (B never evaluated), A true and B false, A true and B true. A fourth
+// row pins the equality boundary, where wakeUp equals the deadline.
 //
 // Every sleep is exactly 100ms here, so wake-up times are round numbers.
 func TestDeadlineDecision(t *testing.T) {
@@ -64,7 +69,15 @@ func TestDeadlineDecision(t *testing.T) {
 	}
 }
 
-// TestMaxAttemptsDecision pins the boundary of attempt >= MaxAttempts.
+// TestMaxAttemptsDecision covers the single-condition decision in Do:
+//
+//	if attempt >= r.policy.MaxAttempts { give up }
+//
+// One condition needs only both outcomes. The first row makes it true on
+// the first attempt, which also pins the smallest cap. The second row
+// makes it false once and then true, which shows the cap is inclusive.
+// The success exit one line above is a separate decision that the spec
+// tests cover.
 func TestMaxAttemptsDecision(t *testing.T) {
 	rows := []struct {
 		name        string
@@ -74,9 +87,7 @@ func TestMaxAttemptsDecision(t *testing.T) {
 		wantCalls   int
 	}{
 		{"one attempt, fails", 1, 100, true, 1},
-		{"one attempt, succeeds", 1, 0, false, 1},
 		{"two attempts, fails twice", 2, 100, true, 2},
-		{"two attempts, succeeds on second", 2, 1, false, 2},
 	}
 	for _, row := range rows {
 		t.Run(row.name, func(t *testing.T) {
@@ -101,7 +112,13 @@ func TestMaxAttemptsDecision(t *testing.T) {
 
 // TestBackoffCapDecision covers the cap check inside the Backoff loop:
 //
-//	delay >= float64(p.MaxDelay)
+//	if delay >= float64(p.MaxDelay) { return p.MaxDelay }
+//
+// One condition, so both outcomes must appear: a delay below the cap that
+// keeps growing, and a delay at or above the cap that returns MaxDelay.
+// The >= needs both the equal and the greater case, and one row must skip
+// the loop entirely so the decision is shown to be reachable only from
+// attempt two on.
 func TestBackoffCapDecision(t *testing.T) {
 	rows := []struct {
 		name     string
@@ -135,9 +152,20 @@ func TestBackoffCapDecision(t *testing.T) {
 	}
 }
 
-// TestPolicyValidationDecisions covers the switch in Policy.validate.
-// The first row is valid. Every other row breaks exactly one field and
-// expects the panic message to name that field.
+// TestPolicyValidationDecisions covers the switch in Policy.validate:
+//
+//	case p.InitialDelay <= 0
+//	case p.MaxDelay < p.InitialDelay
+//	case p.Multiplier < 1 || math.IsNaN(p.Multiplier)
+//	case p.MaxAttempts < 1
+//	case p.Timeout < 0
+//
+// Each case is its own decision, so every case needs a row that makes it
+// true while all others are false, plus one row where every case is
+// false. Naming the field in the panic message proves which case fired.
+// The Multiplier case is an OR of two conditions, so it needs a row for
+// each side: a value below one and a NaN. Boundary rows pin each <= and
+// < at equality.
 func TestPolicyValidationDecisions(t *testing.T) {
 	valid := retry.Policy{
 		InitialDelay: 100 * time.Millisecond,
