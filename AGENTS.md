@@ -25,6 +25,8 @@ work.
   by dated topic folder. Write scripts in Go or Bash unless another language
   is necessary. See `.scratchpad/AGENTS.md`. Review it periodically for
   knowledge or code worth promoting into the repo.
+- Use the `do-work` skill for any task that may outlive one context window.
+  It keeps a resumable state file in `.scratchpad/state/`.
 - Do not commit unless asked.
 - When asked to commit, group related changes into clear batches and write a
   clear commit message for each batch.
