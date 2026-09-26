@@ -21,6 +21,10 @@ work.
 - Each sim module has an `architecture.md` next to its code. See
   `sim/AGENTS.md`.
 - Start at `docs/index.md` for all other docs.
+- Put scripts, research notes, and experiments in `.scratchpad/`, organized
+  by dated topic folder. Write scripts in Go or Bash unless another language
+  is necessary. See `.scratchpad/AGENTS.md`. Review it periodically for
+  knowledge or code worth promoting into the repo.
 - Do not commit unless asked.
 - When asked to commit, group related changes into clear batches and write a
   clear commit message for each batch.
