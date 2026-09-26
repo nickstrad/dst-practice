@@ -3,6 +3,8 @@
 The `docs/` folder holds documentation for people and agents. It holds no
 code. Update this index whenever you add a file to `docs/`.
 
+- `options.md`: the project list and the deterministic simulation testing
+  patterns each project covers.
 - `coding-style.md`: the rules for code in this repo. Read it before you
   write or review Go code.
 - `knowledge/`: learnings from past work, such as gotchas, decisions, and

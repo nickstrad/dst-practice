@@ -6,7 +6,7 @@ The system under test must never read the wall clock. It receives a
 `Clock` at construction and asks that clock for the time and for sleeps.
 Production passes `Real`. Tests pass `Fake`, which lets the test own time:
 a sleep of one second costs nothing, and the test can inspect every sleep
-the system asked for. This package carries pattern P2 in `options.md`.
+the system asked for. This package carries pattern P2 in `docs/options.md`.
 
 ## Shape
 

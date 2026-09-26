@@ -1,7 +1,7 @@
 # sim/AGENTS.md
 
 Every package under `sim/` gets an `architecture.md` next to its Go source.
-This includes `sim/clock`, and the packages `options.md` lists as future
+This includes `sim/clock`, and the packages `docs/options.md` lists as future
 work: `sim/rand`, `sim/disk`, `sim/net`, `sim/sched`, `sim/trace`,
 `sim/check`.
 
@@ -15,7 +15,7 @@ its structure for every new package.
 
 ## Point
 One paragraph: the problem this fake solves and the DST pattern IDs from
-options.md it carries. Example: P2 fake clock.
+docs/options.md it carries. Example: P2 fake clock.
 
 ## Shape
 Text-art diagram of the interface, the real implementation, and the fake,
@@ -27,8 +27,10 @@ a test controls time or faults. Follow it with a short paragraph or a few
 bullets.
 
 ## What it proves
-The invariants a test can check because this fake exists. State its limits
-too.
+The invariants of this package, and the invariants a test can check in a
+system under test because this fake exists. Give each an ID and name the
+test that checks it. State its limits too. This section is the only home
+for a sim package's invariants. Do not add an invariants.md under sim/.
 
 ## Open items
 What the fake does not do yet, and which future project needs it.
@@ -45,5 +47,9 @@ What the fake does not do yet, and which future project needs it.
 - Follow `docs/coding-style.md` and the writing-well rules: active voice,
   short sentences.
 - Explain mechanism and intent. Skip a line-by-line account of the code.
-  Link the pattern IDs in `options.md`.
+  Link the pattern IDs in `docs/options.md`.
 - Keep the whole file readable in one or two screens.
+- A system under test outside `sim/` owns its invariants in its own
+  `invariants.md`. `What it proves` may repeat the ones this fake enables,
+  but it links to that file rather than restating the full list. See the
+  Invariants section in the top-level `AGENTS.md`.

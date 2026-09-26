@@ -1,7 +1,7 @@
 # dst-practice
 
 Small systems built to practice deterministic simulation testing (DST).
-See `options.md` for the full list of projects and the patterns each one
+See `docs/options.md` for the full list of projects and the patterns each one
 exercises.
 
 The rule every system under test follows: it never spawns a goroutine, never
