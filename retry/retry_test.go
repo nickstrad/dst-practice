@@ -1,10 +1,10 @@
 package retry_test
 
+// Spec tests. Each test is one named behavior with exact numbers, so a
+// reader learns what the retrier does from the test names and bodies.
+
 import (
 	"errors"
-	"flag"
-	"fmt"
-	"math/rand/v2"
 	"slices"
 	"testing"
 	"time"
@@ -13,44 +13,7 @@ import (
 	"dstpractice/sim/clock"
 )
 
-// Every test starts the fake clock here. The exact instant does not matter.
-var epoch = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
-
-var errFlaky = errors.New("flaky")
-
-// schedulePolicy doubles from 200ms and caps at 2s. With halfRand every
-// sleep is exactly half the backoff: 100ms, 200ms, 400ms, 800ms, 1s, 1s...
-var schedulePolicy = retry.Policy{
-	InitialDelay: 200 * time.Millisecond,
-	MaxDelay:     2 * time.Second,
-	Multiplier:   2,
-	MaxAttempts:  10,
-}
-
-// fixedRand always returns the same value, so a test can predict the
-// exact sleep instead of getting a random one.
-type fixedRand struct{ value float64 }
-
-func (f fixedRand) Float64() float64 { return f.value }
-
-// halfRand makes every sleep exactly half its backoff upper bound.
-var halfRand = fixedRand{0.5}
-
-// flakyOp is an operation that fails a fixed number of times, then
-// succeeds. Pass op.Do to the retrier and read op.calls afterwards.
-type flakyOp struct {
-	failures int // how many calls return an error before succeeding
-	calls    int // how many times Do has run
-}
-
-func (op *flakyOp) Do() error {
-	op.calls++
-	if op.calls <= op.failures {
-		return errFlaky
-	}
-	return nil
-}
-
+// I8: the schedule starts at InitialDelay, multiplies, and caps.
 func TestBackoffSchedule(t *testing.T) {
 	want := []time.Duration{
 		200 * time.Millisecond,  // attempt 1
@@ -68,6 +31,7 @@ func TestBackoffSchedule(t *testing.T) {
 	}
 }
 
+// I2, I5: one call, no sleep, nil error.
 func TestSucceedsFirstTry(t *testing.T) {
 	clk := clock.NewFake(epoch)
 	r := retry.New(retry.DefaultPolicy, clk, halfRand)
@@ -84,6 +48,7 @@ func TestSucceedsFirstTry(t *testing.T) {
 	}
 }
 
+// I3: with jitter fixed at one half, the sleeps are half the schedule.
 func TestSleepsFollowSchedule(t *testing.T) {
 	clk := clock.NewFake(epoch)
 	r := retry.New(schedulePolicy, clk, halfRand)
@@ -108,6 +73,7 @@ func TestSleepsFollowSchedule(t *testing.T) {
 	}
 }
 
+// I1, I2, I6: the attempt cap holds and the error wraps the op's error.
 func TestGivesUpAfterMaxAttempts(t *testing.T) {
 	p := retry.Policy{
 		InitialDelay: 10 * time.Millisecond,
@@ -140,6 +106,7 @@ func TestGivesUpAfterMaxAttempts(t *testing.T) {
 	}
 }
 
+// I4: the retrier stops before a sleep that would cross the deadline.
 func TestGivesUpAtDeadline(t *testing.T) {
 	p := retry.Policy{
 		InitialDelay: 200 * time.Millisecond,
@@ -167,6 +134,7 @@ func TestGivesUpAtDeadline(t *testing.T) {
 	}
 }
 
+// I4: time the op itself burns counts against the deadline.
 func TestDeadlineCountsTimeSpentInsideOp(t *testing.T) {
 	p := retry.Policy{
 		InitialDelay: 10 * time.Millisecond,
@@ -194,6 +162,7 @@ func TestDeadlineCountsTimeSpentInsideOp(t *testing.T) {
 	}
 }
 
+// I7: Stop ends the loop at once and Do returns the unwrapped error.
 func TestStopEndsRetryingImmediately(t *testing.T) {
 	clk := clock.NewFake(epoch)
 	r := retry.New(retry.DefaultPolicy, clk, halfRand)
@@ -216,6 +185,7 @@ func TestStopEndsRetryingImmediately(t *testing.T) {
 	}
 }
 
+// I9: a bad policy is a programming error, so New panics.
 func TestInvalidPolicyPanics(t *testing.T) {
 	defer func() {
 		if recover() == nil {
@@ -223,88 +193,4 @@ func TestInvalidPolicyPanics(t *testing.T) {
 		}
 	}()
 	retry.New(retry.Policy{}, clock.NewFake(epoch), halfRand)
-}
-
-// Flags for the seeded test below.
-//
-//	go test ./retry -run TestInvariantsAcrossSeeds -seed 42   # replay one seed
-//	go test ./retry -runs 10000                                # try more seeds
-var (
-	seedFlag = flag.Uint64("seed", 0, "run only this seed (0 means many random seeds)")
-	runsFlag = flag.Int("runs", 1000, "how many random seeds to try when -seed is not set")
-)
-
-// TestInvariantsAcrossSeeds is the DST-style test. It runs many seeded
-// simulations with real jitter and checks properties that must hold for
-// every seed. On failure it prints the seed so you can replay just that one.
-func TestInvariantsAcrossSeeds(t *testing.T) {
-	if *seedFlag != 0 {
-		checkInvariants(t, *seedFlag)
-		return
-	}
-	for range *runsFlag {
-		checkInvariants(t, rand.Uint64())
-	}
-}
-
-func checkInvariants(t *testing.T, seed uint64) {
-	t.Helper()
-	rng := rand.New(rand.NewPCG(seed, 0))
-
-	// Randomize the policy too, within sane bounds, so we cover more than
-	// one shape of schedule.
-	p := retry.Policy{
-		InitialDelay: time.Duration(1+rng.IntN(500)) * time.Millisecond,
-		Multiplier:   1 + rng.Float64()*3, // [1, 4)
-		MaxAttempts:  1 + rng.IntN(20),
-	}
-	p.MaxDelay = p.InitialDelay * time.Duration(1+rng.IntN(20))
-	if rng.IntN(2) == 0 {
-		p.Timeout = time.Duration(rng.IntN(10000)) * time.Millisecond
-	}
-
-	clk := clock.NewFake(epoch)
-	r := retry.New(p, clk, rng)
-	op := &flakyOp{failures: rng.IntN(30)}
-	err := r.Do(op.Do)
-
-	// Every failure message starts with enough to replay this run.
-	run := fmt.Sprintf("seed=%d policy=%+v failures=%d", seed, p, op.failures)
-
-	// Invariant: never more than MaxAttempts calls.
-	if op.calls > p.MaxAttempts {
-		t.Errorf("%s: op ran %d times, more than MaxAttempts", run, op.calls)
-	}
-
-	// Invariant: exactly one fewer sleep than calls.
-	if len(clk.Sleeps) != op.calls-1 {
-		t.Errorf("%s: %d sleeps for %d calls", run, len(clk.Sleeps), op.calls)
-	}
-
-	// Invariant: every sleep is within [0, Backoff(attempt)).
-	for i, s := range clk.Sleeps {
-		attempt := i + 1
-		upper := retry.Backoff(p, attempt)
-		if s < 0 || s >= upper {
-			t.Errorf("%s: sleep %d = %v, outside [0, %v)", run, i, s, upper)
-		}
-	}
-
-	// Invariant: never sleep past the deadline.
-	if p.Timeout > 0 && clk.Now().Sub(epoch) > p.Timeout {
-		t.Errorf("%s: clock ended at %v past start, beyond timeout %v", run, clk.Now().Sub(epoch), p.Timeout)
-	}
-
-	// Invariant: the result matches what the model says.
-	// The model: success iff the op succeeded on some attempt we made.
-	succeeded := op.calls > op.failures
-	if succeeded && err != nil {
-		t.Errorf("%s: op succeeded on call %d but Do returned %v", run, op.calls, err)
-	}
-	if !succeeded && err == nil {
-		t.Errorf("%s: op never succeeded but Do returned nil", run)
-	}
-	if !succeeded && !errors.Is(err, errFlaky) {
-		t.Errorf("%s: Do returned %v, which does not wrap the op's error", run, err)
-	}
 }

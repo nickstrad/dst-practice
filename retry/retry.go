@@ -25,6 +25,7 @@ package retry
 import (
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"dstpractice/sim/clock"
@@ -91,7 +92,8 @@ func (p Policy) validate() error {
 		return errors.New("InitialDelay must be > 0")
 	case p.MaxDelay < p.InitialDelay:
 		return errors.New("MaxDelay must be >= InitialDelay")
-	case p.Multiplier < 1:
+	// NaN fails every comparison, so "< 1" alone would let it through.
+	case p.Multiplier < 1 || math.IsNaN(p.Multiplier):
 		return errors.New("Multiplier must be >= 1")
 	case p.MaxAttempts < 1:
 		return errors.New("MaxAttempts must be >= 1")
@@ -122,8 +124,7 @@ func (r *Retrier) Do(op func() error) error {
 			return nil
 		}
 
-		var perm *permanent
-		if errors.As(err, &perm) {
+		if perm, ok := errors.AsType[*permanent](err); ok {
 			return perm.err
 		}
 
