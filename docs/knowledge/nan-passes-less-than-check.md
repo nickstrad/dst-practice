@@ -1,8 +1,8 @@
 # NaN passes a less-than validation check
 
 ## Context
-Adding fuzz and decision-table tests to `retry/`. A seed input with
-`Multiplier: math.NaN()` made `retry.New` accept the policy.
+Adding fuzz and decision-table tests to `projects/retry/`. A seed input
+with `Multiplier: math.NaN()` made `retry.New` accept the policy.
 
 ## Learning
 Every comparison with NaN is false. A guard written as `if x < 1 { reject }`
@@ -22,7 +22,7 @@ and a NaN seed to the fuzz corpus for every float field.
 
 ## Evidence
 `FuzzPolicyValidation` seed 2 and `TestPolicyValidationDecisions/Multiplier_NaN`
-in `retry/`, fixed in `Policy.validate` on 2026-09-25.
+in `projects/retry/`, fixed in `Policy.validate` on 2026-09-25.
 
 ## Related
-`docs/testing.md`, `retry/invariants.md` I9.
+`docs/testing.md`, `projects/retry/invariants.md` I9.

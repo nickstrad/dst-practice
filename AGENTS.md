@@ -3,8 +3,9 @@
 ## What this repo is
 
 This repo holds small Go systems built to practice deterministic simulation
-testing. See `docs/options.md` for the project list and `.scratchpad/state/`
-for work in flight.
+testing. Each system lives in its own folder under `projects/`. See
+`docs/options.md` for the project list and `.scratchpad/state/` for work
+in flight.
 
 ## Always do first
 
@@ -23,6 +24,8 @@ for work in flight.
   chat threads, comments, docs, and commit messages.
 - Each sim module has an `architecture.md` next to its code. See
   `sim/AGENTS.md`.
+- Each project lives in its own folder under `projects/`. See
+  `projects/AGENTS.md`.
 - Each system under test outside `sim/` has an `invariants.md` next to its
   code. Sim packages state their invariants in `architecture.md` instead.
   See the Invariants section below.
@@ -43,7 +46,7 @@ Everything in this repo exists to state invariants and test them. Each
 invariant lives in exactly one document and is checked by at least one
 named test.
 
-- A system under test outside `sim/`, such as `retry/`, owns its
+- A system under test outside `sim/`, such as `projects/retry/`, owns its
   invariants in `invariants.md` next to its Go source.
 - A package under `sim/` states its invariants in the `What it proves`
   section of its `architecture.md`. Do not add an `invariants.md` there.

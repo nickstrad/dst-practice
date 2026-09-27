@@ -11,7 +11,8 @@ construction. Production passes real ones. Tests pass fakes.
 
 ## Layout
 
-    retry/          project 1: retry with exponential backoff and full jitter
+    projects/       one folder per project from docs/options.md
+    projects/retry/ project 1: retry with exponential backoff and full jitter
     sim/clock/      Clock interface, Real clock, Fake clock, architecture.md
     cmd/retrydemo/  runs the retrier against the real clock
     docs/           coding style, knowledge base, and docs for agents
@@ -31,23 +32,6 @@ Readers and agents: start at `docs/index.md` for the docs.
 Without make:
 
     go test ./...
-    go test ./retry -runs 100000
-    go test ./retry -run TestInvariantsAcrossSeeds -seed 42
+    go test ./projects/retry -runs 100000
+    go test ./projects/retry -run TestInvariantsAcrossSeeds -seed 42
     go run ./cmd/retrydemo
-
-## Using the retrier
-
-```go
-r := retry.New(retry.DefaultPolicy, clock.Real{}, rand.New(rand.NewPCG(1, 2)))
-
-err := r.Do(func() error {
-    resp, err := client.Get(url)
-    if err != nil {
-        return err // transient: will be retried
-    }
-    if resp.StatusCode == 400 {
-        return retry.Stop(errors.New("bad request")) // permanent: stop now
-    }
-    return nil
-})
-```

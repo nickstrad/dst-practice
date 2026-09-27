@@ -21,8 +21,8 @@ checks an invariant names the invariant's ID in a comment. The IDs come
 from the package's `invariants.md`, or from the `What it proves` section
 of a sim package's `architecture.md`.
 
-`retry/` is the reference example. Read its five test files in the order
-above.
+`projects/retry/` is the reference example. Read its five test files in
+the order above.
 
 ## Spec tests
 

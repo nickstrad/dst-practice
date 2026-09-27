@@ -98,7 +98,7 @@ r := retry.New(policy, clock.NewFake(epoch), rng)  // test
 ## What it proves
 
 With `Fake` in place a test can check, without waiting and with exact
-numbers. `retry/invariants.md` owns the full list with IDs and test
+numbers. `projects/retry/invariants.md` owns the full list with IDs and test
 names. In short:
 
 - The sequence of sleeps matches the backoff schedule.

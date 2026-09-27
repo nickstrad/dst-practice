@@ -34,7 +34,7 @@ Rule: a comment says why the code does something, not what it does.
 
 The code already says what. A package doc comment goes further and shows a
 worked example of the schedule or behavior, like the backoff table at the
-top of `retry/retry.go`.
+top of `projects/retry/retry.go`.
 
 ## Tests read like a spec
 
@@ -98,7 +98,7 @@ replay it.
 
 A failure you cannot replay is a failure you cannot fix.
 
-    go test ./retry -run TestInvariantsAcrossSeeds -seed 42
+    go test ./projects/retry -run TestInvariantsAcrossSeeds -seed 42
 
 ## Clean before done
 

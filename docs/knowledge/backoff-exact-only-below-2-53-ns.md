@@ -26,4 +26,5 @@ system needs exact huge durations, compute in integers instead.
 9223372036854775806 on 2026-09-25.
 
 ## Related
-`retry/invariants.md` Not promised, `retry/retry_fuzz_test.go`.
+`projects/retry/invariants.md` Not promised,
+`projects/retry/retry_fuzz_test.go`.

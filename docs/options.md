@@ -41,7 +41,9 @@ Reusable simulator building blocks you end up with, and which patterns they carr
 ## Projects, ordered by scope
 
 Tiers are rough. Within a tier, earlier items are smaller. Each entry lists the
-SUT, the invariants to check, patterns covered, and an SUT size guess.
+SUT, the invariants to check, patterns covered, and an SUT size guess. A
+finished project lives in its own folder under `projects/`, named after its
+package. See `projects/AGENTS.md`.
 
 ### Tier 0: warmups, one sitting each
 
