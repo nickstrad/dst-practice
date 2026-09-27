@@ -10,7 +10,7 @@ import (
 	"math/rand/v2"
 	"time"
 
-	"dstpractice/retry"
+	"dstpractice/projects/retry"
 	"dstpractice/sim/clock"
 )
 

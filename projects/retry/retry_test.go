@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"dstpractice/retry"
+	"dstpractice/projects/retry"
 	"dstpractice/sim/clock"
 )
 

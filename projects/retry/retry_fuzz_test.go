@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"dstpractice/retry"
+	"dstpractice/projects/retry"
 )
 
 // maxExact is the largest delay Backoff computes exactly. Backoff

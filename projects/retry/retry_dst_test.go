@@ -11,13 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"dstpractice/retry"
+	"dstpractice/projects/retry"
 )
 
 // Flags for the seeded test.
 //
-//	go test ./retry -run TestInvariantsAcrossSeeds -seed 42   # replay one seed
-//	go test ./retry -runs 10000                                # try more seeds
+//	go test ./projects/retry -run TestInvariantsAcrossSeeds -seed 42   # replay one seed
+//	go test ./projects/retry -runs 10000                                # try more seeds
 var (
 	seedFlag = flag.Uint64("seed", 0, "run only this seed (0 means many random seeds)")
 	runsFlag = flag.Int("runs", 1000, "how many random seeds to try when -seed is not set")

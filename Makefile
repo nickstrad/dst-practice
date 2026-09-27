@@ -14,16 +14,16 @@ test: ## run all tests
 	go test ./...
 
 test-seeds: ## run the seeded invariant tests with more seeds (RUNS=100000)
-	go test ./retry -run TestInvariantsAcrossSeeds -runs $(RUNS)
+	go test ./projects/retry -run TestInvariantsAcrossSeeds -runs $(RUNS)
 
 seed: ## replay one seed (SEED=42)
 	@if [ "$(SEED)" = "0" ]; then echo "usage: make seed SEED=<n>"; exit 1; fi
-	go test ./retry -run TestInvariantsAcrossSeeds -v -seed $(SEED)
+	go test ./projects/retry -run TestInvariantsAcrossSeeds -v -seed $(SEED)
 
 fuzz: ## run each fuzz target for FUZZTIME (default 10s)
 	@for f in $(FUZZ_TARGETS); do \
 		echo "== $$f"; \
-		go test ./retry -run '^$$' -fuzz "^$$f$$" -fuzztime $(FUZZTIME) || exit 1; \
+		go test ./projects/retry -run '^$$' -fuzz "^$$f$$" -fuzztime $(FUZZTIME) || exit 1; \
 	done
 
 cover: ## statement coverage per function (Go has no MC/DC tool)
