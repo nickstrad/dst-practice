@@ -40,6 +40,37 @@ in flight.
 - When asked to commit, group related changes into clear batches and write a
   clear commit message for each batch.
 
+## Plans with subagents
+
+Use `plan-agent-flow-state` when asked for a detailed plan with agent
+assignments and persistent state. Use `do-work` to maintain the same file
+at `.scratchpad/state/<task>.md`; do not create a second state file.
+
+Reuse these roles from `.claude/agents/*.md` or `.codex/agents/*.toml`:
+
+| Role | Model and effort | Responsibility |
+|---|---|---|
+| `plan-coordinator` | Fable high / Astra high | Own design, task assignments, state, validation, and escalation. |
+| `plan-builder-strong` | Opus medium / Sol medium | Build stateful logic and complex tests. |
+| `plan-builder-fast` | Sonnet high / Luna high | Build bounded tables, commands, and documentation. |
+| `plan-reviewer` | Fable high / Astra high | Independently review plans, coordinator work, and final integration. |
+
+These repo defaults replace the skill's generic role installation and
+commit workflow. Do not generate task-specific role copies. The coordinator
+reads submissions and reruns acceptance checks; an independent reviewer
+checks the coordinator's own work. Keep the execution table and append-only
+log current, including owners, models, attempts, findings, evidence, and
+next actions. Reuse accepted uncommitted work after a context clear, and
+check for live agents before reassigning their files.
+
+A request to plan produces a reviewed plan. A request to build or implement
+authorizes execution through the coordinator without another approval
+step. Never commit unless asked; leave plans and role definitions
+uncommitted unless the user explicitly changes that restriction.
+
+Example: `$plan-agent-flow-state build <feature>`.
+Resume: `Continue .scratchpad/state/<task>.md`.
+
 ## Invariants
 
 Everything in this repo exists to state invariants and test them. Each
