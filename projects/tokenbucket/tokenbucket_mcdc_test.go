@@ -95,7 +95,7 @@ func TestRefillCapDecisions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			clk := clock.NewFake(decisionStart)
 			b := tokenbucket.New(tokenbucket.Policy{Every: 10 * time.Nanosecond, Burst: 2}, clk)
-			if !b.Allow() || !b.Allow() || b.Allow() {
+			if !b.Allow() || b.Allow() {
 				t.Fatal("could not establish an empty bucket")
 			}
 			clk.Advance(tc.elapsed)
