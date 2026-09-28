@@ -11,5 +11,9 @@ code. Update this index whenever you add a file to `docs/`.
   to run them. Read it before you add or change a test.
 - `knowledge/`: learnings from past work, such as gotchas, decisions, and
   patterns. Start at `knowledge/index.md` and read it before any task.
+- `knowledge/check-fuzz-seeds-after-folding.md`: why fixed seeds must match
+  their decoded policies and event sequences.
+- `knowledge/probe-residual-state-after-a-cap.md`: how later calls reveal
+  incorrect surplus that immediate cap observations can miss.
 - `AGENTS.md`: instructions for AI agents that edit files in `docs/`. Read
   it before you add or change a doc.
