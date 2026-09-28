@@ -55,7 +55,7 @@ package. See `projects/AGENTS.md`.
 
 2. **Token bucket rate limiter**
    SUT: token bucket with refill rate and burst.
-   Invariants: no sliding window of N seconds admits more than the limit; a starved caller eventually gets a token.
+   Invariants: every closed interval of length d admits at most `Burst + floor(d/Every)` requests. After a denial, a retry at least `Every` later succeeds if no intervening call succeeds. This conditional progress does not promise fairness among callers.
    Patterns: P1, P2, P5, P11.
    Size: ~50 lines.
 

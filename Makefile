@@ -3,7 +3,15 @@
 SEED ?= 0
 RUNS ?= 1000
 FUZZTIME ?= 10s
+PROJECT ?= retry
+
+ifeq ($(PROJECT),retry)
 FUZZ_TARGETS := FuzzBackoff FuzzPolicyValidation FuzzDo
+else ifeq ($(PROJECT),tokenbucket)
+FUZZ_TARGETS := FuzzAllow FuzzPolicyValidation
+else
+FUZZ_TARGETS :=
+endif
 
 .PHONY: help test test-seeds seed fuzz cover vet fmt demo clean
 
@@ -13,17 +21,20 @@ help: ## show this list
 test: ## run all tests
 	go test ./...
 
-test-seeds: ## run the seeded invariant tests with more seeds (RUNS=100000)
-	go test ./projects/retry -run TestInvariantsAcrossSeeds -runs $(RUNS)
+test-seeds: ## run seeded invariant tests (PROJECT=retry|tokenbucket, RUNS=100000)
+	@case "$(PROJECT)" in retry|tokenbucket) ;; *) echo "unsupported PROJECT='$(PROJECT)' (choose retry or tokenbucket)" >&2; exit 2;; esac
+	go test ./projects/$(PROJECT) -run TestInvariantsAcrossSeeds -runs $(RUNS)
 
-seed: ## replay one seed (SEED=42)
+seed: ## replay one seed (PROJECT=retry|tokenbucket, SEED=42)
+	@case "$(PROJECT)" in retry|tokenbucket) ;; *) echo "unsupported PROJECT='$(PROJECT)' (choose retry or tokenbucket)" >&2; exit 2;; esac
 	@if [ "$(SEED)" = "0" ]; then echo "usage: make seed SEED=<n>"; exit 1; fi
-	go test ./projects/retry -run TestInvariantsAcrossSeeds -v -seed $(SEED)
+	go test ./projects/$(PROJECT) -run TestInvariantsAcrossSeeds -v -seed $(SEED)
 
-fuzz: ## run each fuzz target for FUZZTIME (default 10s)
+fuzz: ## run project fuzz targets (PROJECT=retry|tokenbucket, FUZZTIME=10s)
+	@case "$(PROJECT)" in retry|tokenbucket) ;; *) echo "unsupported PROJECT='$(PROJECT)' (choose retry or tokenbucket)" >&2; exit 2;; esac
 	@for f in $(FUZZ_TARGETS); do \
 		echo "== $$f"; \
-		go test ./projects/retry -run '^$$' -fuzz "^$$f$$" -fuzztime $(FUZZTIME) || exit 1; \
+		go test ./projects/$(PROJECT) -run '^$$' -fuzz "^$$f$$" -fuzztime $(FUZZTIME) || exit 1; \
 	done
 
 cover: ## statement coverage per function (Go has no MC/DC tool)
