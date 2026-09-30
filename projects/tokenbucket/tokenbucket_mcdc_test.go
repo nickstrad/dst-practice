@@ -95,8 +95,10 @@ func TestRefillCapDecisions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			clk := clock.NewFake(decisionStart)
 			b := tokenbucket.New(tokenbucket.Policy{Every: 10 * time.Nanosecond, Burst: 2}, clk)
-			if !b.Allow() || !b.Allow() || b.Allow() {
-				t.Fatal("could not establish an empty bucket")
+			for call, want := range []bool{true, true, false} {
+				if got := b.Allow(); got != want {
+					t.Fatalf("initial call %d = %t, want %t", call+1, got, want)
+				}
 			}
 			clk.Advance(tc.elapsed)
 			for i, want := range tc.want {
@@ -129,8 +131,10 @@ func TestAdmissionDecisions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			clk := clock.NewFake(decisionStart)
 			b := tokenbucket.New(tokenbucket.Policy{Every: 10 * time.Nanosecond, Burst: 2}, clk)
-			if !b.Allow() || !b.Allow() {
-				t.Fatal("could not spend the initial burst")
+			for call := 1; call <= 2; call++ {
+				if !b.Allow() {
+					t.Fatalf("initial burst call %d was denied", call)
+				}
 			}
 			clk.Advance(tc.elapsed)
 			if got := b.Allow(); got != tc.first {

@@ -76,8 +76,10 @@ func TestDeniedCallsPreserveFractionalRefill(t *testing.T) {
 func TestAdmissionSpendsOneToken(t *testing.T) {
 	clk := clock.NewFake(start)
 	b := tokenbucket.New(tokenbucket.Policy{Every: 100 * time.Millisecond, Burst: 2}, clk)
-	if !b.Allow() || !b.Allow() {
-		t.Fatal("initial burst was denied")
+	for call := 1; call <= 2; call++ {
+		if !b.Allow() {
+			t.Fatalf("initial burst call %d was denied", call)
+		}
 	}
 	clk.Advance(150 * time.Millisecond)
 	if !b.Allow() {
@@ -96,8 +98,10 @@ func TestAdmissionSpendsOneToken(t *testing.T) {
 func TestIdleRefillCapsAtBurst(t *testing.T) {
 	clk := clock.NewFake(start)
 	b := tokenbucket.New(tokenbucket.Policy{Every: 100 * time.Millisecond, Burst: 2}, clk)
-	if !b.Allow() || !b.Allow() || b.Allow() {
-		t.Fatal("initial burst was not exactly two calls")
+	for call, want := range []bool{true, true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("initial burst call %d = %t, want %t", call+1, got, want)
+		}
 	}
 	clk.Advance(time.Second)
 	for i, want := range []bool{true, true, false} {
@@ -112,8 +116,10 @@ func TestFullBucketDiscardsIdleCredit(t *testing.T) {
 	clk := clock.NewFake(start)
 	b := tokenbucket.New(tokenbucket.Policy{Every: 100 * time.Millisecond, Burst: 2}, clk)
 	clk.Advance(time.Second)
-	if !b.Allow() || !b.Allow() || b.Allow() {
-		t.Fatal("full bucket did not admit exactly two calls")
+	for call, want := range []bool{true, true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("call %d after idle = %t, want %t", call+1, got, want)
+		}
 	}
 	clk.Advance(time.Nanosecond)
 	if b.Allow() {
@@ -149,8 +155,10 @@ func TestAdmissionEnvelope(t *testing.T) {
 func TestDeniedCallerProgressAfterQuietPeriod(t *testing.T) {
 	clk := clock.NewFake(start)
 	b := tokenbucket.New(tokenbucket.Policy{Every: 100 * time.Millisecond, Burst: 1}, clk)
-	if !b.Allow() || b.Allow() {
-		t.Fatal("expected one initial admission followed by denial")
+	for call, want := range []bool{true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("initial call %d = %t, want %t", call+1, got, want)
+		}
 	}
 	clk.Advance(100 * time.Millisecond)
 	if !b.Allow() {
@@ -217,8 +225,10 @@ func TestInvalidPolicyPanics(t *testing.T) {
 func TestLargestValidCapacity(t *testing.T) {
 	clk := clock.NewFake(start)
 	b := tokenbucket.New(tokenbucket.Policy{Every: time.Duration(math.MaxInt64), Burst: 1}, clk)
-	if !b.Allow() || b.Allow() {
-		t.Fatal("MaxInt64-nanosecond capacity did not hold exactly one token")
+	for call, want := range []bool{true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("initial call %d = %t, want %t", call+1, got, want)
+		}
 	}
 	clk.Advance(time.Duration(math.MaxInt64) - time.Nanosecond)
 	if b.Allow() {
@@ -244,12 +254,16 @@ func TestLargestValidCapacity(t *testing.T) {
 func TestNanosecondRefill(t *testing.T) {
 	clk := clock.NewFake(start)
 	b := tokenbucket.New(tokenbucket.Policy{Every: time.Nanosecond, Burst: 1}, clk)
-	if !b.Allow() || b.Allow() {
-		t.Fatal("initial nanosecond token behavior was wrong")
+	for call, want := range []bool{true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("initial call %d = %t, want %t", call+1, got, want)
+		}
 	}
 	clk.Advance(time.Nanosecond)
-	if !b.Allow() || b.Allow() {
-		t.Fatal("one nanosecond did not refill exactly one token")
+	for call, want := range []bool{true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("call %d after one nanosecond = %t, want %t", call+1, got, want)
+		}
 	}
 }
 
@@ -262,12 +276,16 @@ func TestLargeIdleGapSaturates(t *testing.T) {
 	}
 	clk := &observedClock{now: first}
 	b := tokenbucket.New(tokenbucket.Policy{Every: 100 * time.Millisecond, Burst: 2}, clk)
-	if !b.Allow() || !b.Allow() || b.Allow() {
-		t.Fatal("initial burst was not exactly two calls")
+	for call, want := range []bool{true, true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("initial burst call %d = %t, want %t", call+1, got, want)
+		}
 	}
 	clk.now = last
-	if !b.Allow() || !b.Allow() || b.Allow() {
-		t.Fatal("large idle gap did not refill exactly the burst")
+	for call, want := range []bool{true, true, false} {
+		if got := b.Allow(); got != want {
+			t.Fatalf("call %d after large idle gap = %t, want %t", call+1, got, want)
+		}
 	}
 }
 
