@@ -7,44 +7,69 @@ calls. The caller controls time through the supplied clock.
 ## Invariants
 
 - I1. A new bucket admits exactly `Burst` calls at its initial timestamp
-  before denying another. Checked by `TestStartsFull`,
-  `TestReferenceModelInitialBurst`, `TestInvariantsAcrossSeeds`, `FuzzAllow`.
+  before denying another.
+
+  ```text
+  Burst=2, time=0:  allow -> allow -> deny
+  ```
+
 - I2. At each call, `Allow` admits exactly when capped available credit,
   including elapsed fractional refill, can pay for one token; only an
-  admission spends that token. Checked by `TestRefillAtBoundary`,
-  `TestDeniedCallsPreserveFractionalRefill`, `TestAdmissionSpendsOneToken`,
-  `TestReferenceModelFractionalRefill`, `TestReferenceModelDenialPreservesDebt`,
-  `TestReferenceModelBoundaryEqualityAndProgress`, `TestInvariantsAcrossSeeds`,
-  `TestRefillCapDecisions`, `TestAdmissionDecisions`, `FuzzAllow`.
-- I3. Idle time never stores credit beyond `Burst` tokens. Checked by
-  `TestIdleRefillCapsAtBurst`, `TestFullBucketDiscardsIdleCredit`,
-  `TestReferenceModelIdleSaturation`, `TestInvariantsAcrossSeeds`,
-  `TestRefillCapDecisions`, `FuzzAllow`.
+  admission spends that token.
+
+  ```text
+  Every=10ms, Burst=1
+  t=0: allow, credit=0  ->  t=4ms: deny, credit=4ms
+                         -> t=10ms: allow, credit=0
+  ```
+
+- I3. Idle time never stores credit beyond `Burst` tokens.
+
+  ```text
+  Burst=2, Every=10ms:  idle 100ms -> 2 tokens
+  same time:               allow -> allow -> deny
+  ```
+
 - I4. Every closed interval of length `d` contains at most
   `Burst + floor(d/Every)` admissions, counting ties at both endpoints.
-  Checked by `TestAdmissionEnvelope`, `TestReferenceModelTiedWindowEndpoints`,
-  `TestInvariantsAcrossSeeds`, `FuzzAllow`.
+
+  ```text
+  Burst=2, Every=10ms, interval [0, 10ms]
+  t=0: allow, allow        t=10ms: allow     total=3, bound=3
+  ```
+
 - I5. With no successful intervening call, a denied caller succeeds on
-  a retry at least `Every` later. Checked by
-  `TestDeniedCallerProgressAfterQuietPeriod`, `TestReferenceModelDenialPreservesDebt`,
-  `TestReferenceModelBoundaryEqualityAndProgress`, `TestInvariantsAcrossSeeds`,
-  `FuzzAllow`.
+  a retry at least `Every` later.
+
+  ```text
+  Every=10ms:  t=0 deny -> no admissions -> t=10ms allow
+  ```
+
 - I6. `Allow` uses the injected time and never sleeps or advances that
-  clock. Checked by `TestAllowDoesNotSleepOrAdvanceTime`,
-  `TestReferenceModelInitialBurst`, `TestReferenceModelFractionalRefill`,
-  `TestReferenceModelDenialPreservesDebt`, `TestReferenceModelIdleSaturation`,
-  `TestReferenceModelTiedWindowEndpoints`,
-  `TestReferenceModelBoundaryEqualityAndProgress`, `TestInvariantsAcrossSeeds`,
-  `FuzzAllow`.
+  clock.
+
+  ```text
+  fake clock at 10ms -> Allow() -> fake clock still at 10ms
+                                   recorded sleeps: []
+  ```
+
 - I7. Given a valid clock, `New` accepts exactly policies with `Every > 0`,
   `Burst >= 1`, and `Burst*Every <= MaxInt64` nanoseconds; it rejects an
-  invalid policy before accessing the clock. Checked by
-  `TestInvalidPolicyPanics`, `TestLargestValidCapacity`,
-  `TestPolicyValidationDecisions`, `FuzzPolicyValidation`.
+  invalid policy before accessing the clock.
+
+  ```text
+  Every=10ns, Burst=2 -> New reads clock and succeeds
+  Every= 0ns, Burst=2 -> New panics before reading clock
+  ```
+
 - I8. The supported transitions remain exact at representable numeric
   boundaries and after an idle gap longer than `time.Duration` can
-  represent. Checked by `TestLargestValidCapacity`, `TestNanosecondRefill`,
-  `TestLargeIdleGapSaturates`, `TestPolicyValidationDecisions`.
+  represent.
+
+  ```text
+  Every=1ns, Burst=1:  t=0 allow -> t=1ns allow
+  idle gap > MaxInt64 ns: credit stops at capacity, never wraps
+  ```
 
 ## Not promised
 

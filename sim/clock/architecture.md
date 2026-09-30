@@ -98,13 +98,12 @@ r := retry.New(policy, clock.NewFake(epoch), rng)  // test
 ## What it proves
 
 With `Fake` in place a test can check, without waiting and with exact
-numbers. `projects/retry/invariants.md` owns the full list with IDs and test
-names. In short:
+numbers. `projects/retry/invariants.md` owns the full list with IDs and
+examples. Test comments map those IDs to checks. In short:
 
 - The sequence of sleeps matches the backoff schedule.
 - Every sleep stays inside its jitter bounds.
-- The clock never ends up past the deadline, so the retrier never sleeps
-  through it.
+- The retrier skips a sleep that would wake past the deadline.
 - Time spent inside the operation counts against the deadline.
 
 It also makes the seeded test practical. One seed drives thousands of

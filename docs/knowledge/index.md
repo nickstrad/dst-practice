@@ -17,6 +17,7 @@ things that failed.
 
 ## Entries
 
+- [A retry deadline cannot interrupt an operation](retry-deadline-cannot-interrupt-op.md) - the retrier can skip a late sleep but cannot stop an operation already running
 - [Backoff is exact only below 2^53 nanoseconds](backoff-exact-only-below-2-53-ns.md) - fold fuzz durations into [1, 2^53) and list the limit under Not promised
 - [Check fuzz seeds after folding](check-fuzz-seeds-after-folding.md) - verify decoded policies and events before naming fixed corpus cases
 - [make and git can fail with an Xcode license error](make-and-git-need-xcode-license.md) - Apple shims stop working until sudo xcodebuild -license accept; use go commands directly

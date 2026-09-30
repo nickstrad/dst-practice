@@ -28,8 +28,9 @@ bullets.
 
 ## What it proves
 The invariants of this package, and the invariants a test can check in a
-system under test because this fake exists. Give each an ID and name the
-test that checks it. State its limits too. This section is the only home
+system under test because this fake exists. Give each invariant an ID, one
+sentence, and a small text-art example. Test comments carry the ID mapping;
+do not list test names here. State the limits too. This section is the only home
 for a sim package's invariants. Do not add an invariants.md under sim/.
 
 ## Open items
@@ -43,7 +44,8 @@ What the fake does not do yet, and which future project needs it.
   surface.
 - Draw diagrams as plain text art in fenced code blocks. Skip image files
   and mermaid, so the diagram renders in any terminal and diffs cleanly.
-  Keep each diagram under about 25 lines and 72 columns.
+  Keep each diagram under about 25 lines and 72 columns. Keep invariant
+  examples smaller, with only the values needed to show the rule.
 - Follow `docs/coding-style.md` and the writing-well rules: active voice,
   short sentences.
 - Explain mechanism and intent. Skip a line-by-line account of the code.

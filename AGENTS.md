@@ -83,8 +83,12 @@ named test.
   section of its `architecture.md`. Do not add an `invariants.md` there.
 - Create or update the document in the same change that adds or changes
   the behavior. A new invariant lands with the test that checks it.
-- Each invariant has an ID, one sentence, and the name of the test that
-  checks it. A test that checks an invariant names the ID in a comment.
+- Give each invariant an ID, one sentence, and a small text-art example in
+  a fenced block directly below it. Keep the example concrete and show
+  the boundary or sequence that makes the rule visible.
+- Do not list test names in an invariant document. A test that checks an
+  invariant names its ID in a comment. Those comments are the mapping
+  from tests to invariants.
 - A test file checks invariants. It does not define them. If a test
   asserts something the document does not state, add it to the document
   or drop the assertion.
@@ -98,8 +102,17 @@ One paragraph: what the system promises, in plain words.
 
 ## Invariants
 
-- I1. <One sentence that is always true.> Checked by `TestName`.
-- I2. <...> Checked by `TestName`, `TestOther`.
+- I1. <One sentence that is always true.>
+
+  ```text
+  <Small example with concrete values and the observed result.>
+  ```
+
+- I2. <One sentence that is always true.>
+
+  ```text
+  <Small example with a sequence or boundary.>
+  ```
 
 ## Not promised
 

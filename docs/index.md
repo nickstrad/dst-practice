@@ -15,5 +15,7 @@ code. Update this index whenever you add a file to `docs/`.
   their decoded policies and event sequences.
 - `knowledge/probe-residual-state-after-a-cap.md`: how later calls reveal
   incorrect surplus that immediate cap observations can miss.
+- `knowledge/retry-deadline-cannot-interrupt-op.md`: why a retry deadline
+  can skip a late sleep but cannot stop an operation already running.
 - `AGENTS.md`: instructions for AI agents that edit files in `docs/`. Read
   it before you add or change a doc.

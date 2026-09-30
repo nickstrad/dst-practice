@@ -19,7 +19,9 @@ For a package `foo`:
 Every file starts with a comment that says which kind it is. A test that
 checks an invariant names the invariant's ID in a comment. The IDs come
 from the package's `invariants.md`, or from the `What it proves` section
-of a sim package's `architecture.md`.
+of a sim package's `architecture.md`. The invariant document states the
+rule and shows a small text-art example. Test comments provide the mapping
+to checks, so the document does not list test names.
 
 `projects/retry/` is the reference example. Read its five test files in
 the order above.
