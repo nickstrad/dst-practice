@@ -8,11 +8,11 @@ Remove test-name lists from invariant statements. Add a small text-art example f
 
 ## Current state
 
-The documentation changes were committed as 3c1f8c2. The user then asked to fix the token bucket test failure before pushing. TestRefillCapDecisions had tried to empty a Burst=2 bucket with one successful call. Its setup now spends both tokens and checks that a third call is denied. The focused test, make test, and make vet all pass with GOCACHE under /private/tmp.
+The documentation changes were committed as 3c1f8c2. The user then asked to fix the token bucket test failure before pushing. TestRefillCapDecisions had tried to empty a Burst=2 bucket with one successful call. Its setup now spends both tokens and checks that a third call is denied. The fix was committed as 089841a. The focused test, make test, and make vet all pass with GOCACHE under /private/tmp. Both commits were pushed to origin/main.
 
 ## Next step
 
-Commit the test fix and updated state, then push both commits on main.
+No work remains. The user can delete this state file when it is no longer useful.
 
 ## Open questions
 
